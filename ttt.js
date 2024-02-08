@@ -81,11 +81,21 @@ function Gameboard() {
         return false; // No win condition is found
     }
 
+    // Function that clears the board, setting all cells back to their initial state (i.e., empty).
+    function resetBoard() {
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < columns; j++) {
+                board[i][j].reset(); // Assuming you add a reset method to Cell too.
+            }
+        }
+    }
+
     // Return the public methods of the Gameboard
     return {
         printBoard: printBoard,
         placeToken: placeToken,
-        checkWin: checkWin
+        checkWin: checkWin,
+        resetBoard: resetBoard
     };
 }
 
@@ -104,10 +114,15 @@ function Cell() {
         return value; // Return the cell's value
     }
 
+    function reset() {
+        value = ""; // Reset the cell's value to empty
+    }
+
     // Return the public methods of the Cell
     return {
         addToken: addToken,
-        getValue: getValue
+        getValue: getValue,
+        reset: reset
     };
 }
 
@@ -149,7 +164,7 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
         // Check for a win after placing the token
         if (board.checkWin()) {
             console.log(`${getActivePlayer().name} wins!`);
-            // Optionally, end the game or reset the board here
+            resetGame();
             return; // Stop further execution to prevent switching turns after a win
         }
 
@@ -158,13 +173,22 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
         printNewRound();
     }
 
+    //reset game
+    function resetGame() {
+        board.resetBoard(); // Reset the game board
+        activePlayer = players[0]; // Reset the active player to the first player
+        console.log("Game has been reset. Starting a new game...");
+        printNewRound(); // Print the new round's information
+    }
+
     // Print the initial round information
     printNewRound();
 
     // Return the public methods of the GameController
     return {
         playRound: playRound,
-        getActivePlayer: getActivePlayer
+        getActivePlayer: getActivePlayer,
+        resetGame: resetGame
     };
 }
 
