@@ -1,3 +1,4 @@
+//Given standard tic tac toe rules how would I impliment a win state for the following code
 function Gameboard() {
     const rows = 3;
     const columns = 3;
@@ -42,9 +43,35 @@ function Gameboard() {
         cell.addToken(player);
     }
 
+    function checkWin() {
+        const winningCombinations = [
+            // Rows
+            [[0, 0], [0, 1], [0, 2]],
+            [[1, 0], [1, 1], [1, 2]],
+            [[2, 0], [2, 1], [2, 2]],
+            // Columns
+            [[0, 0], [1, 0], [2, 0]],
+            [[0, 1], [1, 1], [2, 1]],
+            [[0, 2], [1, 2], [2, 2]],
+            // Diagonals
+            [[0, 0], [1, 1], [2, 2]],
+            [[0, 2], [1, 1], [2, 0]]
+        ];
+
+        for (let combo of winningCombinations) {
+            const [a, b, c] = combo;
+            if (board[a[0]][a[1]].getValue() && board[a[0]][a[1]].getValue() === board[b[0]][b[1]].getValue() && board[a[0]][a[1]].getValue() === board[c[0]][c[1]].getValue()) {
+                return true; // Win detected
+            }
+        }
+
+        return false; // No win found
+    }
+
     return {
         printBoard: printBoard,
-        placeToken: placeToken
+        placeToken: placeToken,
+        checkWin: checkWin
     };
 }
 
@@ -93,6 +120,12 @@ function GameController(playerOneName, playerTwoName) {
     function playRound(row, column) {
         console.log(`Placing ${getActivePlayer().name}'s token at row ${row}, column ${column}...`);
         board.placeToken(row, column, getActivePlayer().token);
+
+        if (board.checkWin()) {
+            console.log(`${getActivePlayer().name} wins!`);
+            // Here you might want to end the game or reset the board.
+            return; // Stops further execution to prevent switching turns after a win.
+        }
 
         switchPlayerTurn();
         printNewRound();
