@@ -1,3 +1,4 @@
+//how would I add a draw condition
 // Define the Gameboard function, which initializes and manages the game board
 function Gameboard() {
     // Set the dimensions of the Tic Tac Toe board
@@ -81,6 +82,18 @@ function Gameboard() {
         return false; // No win condition is found
     }
 
+    // Function to check if the game is a draw
+    function checkDraw() {
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < columns; j++) {
+                if (board[i][j].getValue() === "") {
+                    return false; // Found an empty cell, so it's not a draw
+                }
+            }
+        }
+        return true; // No empty cells found, it's a draw
+    }
+
     // Function that clears the board, setting all cells back to their initial state (i.e., empty).
     function resetBoard() {
         for (let i = 0; i < rows; i++) {
@@ -95,6 +108,7 @@ function Gameboard() {
         printBoard: printBoard,
         placeToken: placeToken,
         checkWin: checkWin,
+        checkDraw: checkDraw,
         resetBoard: resetBoard
     };
 }
@@ -164,11 +178,17 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
         // Check for a win after placing the token
         if (board.checkWin()) {
             console.log(`${getActivePlayer().name} wins!`);
+            board.printBoard();
             resetGame();
             return; // Stop further execution to prevent switching turns after a win
+        } else if (board.checkDraw()) { // Check for a draw
+            console.log("Game is a draw!");
+            board.printBoard();
+            resetGame();
+            return; // Stop further execution after a draw
         }
 
-        // Switch to the next player's turn if no win is detected
+        // Switch to the next player's turn if no win or draw is detected
         switchPlayerTurn();
         printNewRound();
     }
