@@ -206,9 +206,59 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
     return {
         playRound,
         getActivePlayer,
-        resetGame
+        resetGame,
+        getBoard: board.getBoard
     };
 }
 
-// Initialize the game and start playing
-const game = GameController();
+function ScreenController() {
+    const game = GameController();
+    const playerTurnDiv = document.querySelector('.turn');
+    const boardDiv = document.querySelector('.board');
+
+    const updateScreen = () => {
+        // clear the board
+        boardDiv.textContent = "";
+
+        // get the newest version of the board and player turn
+        const board = game.getBoard();
+        const activePlayer = game.getActivePlayer();
+
+        // Display player's turn
+        playerTurnDiv.textContent = `${activePlayer.name}'s turn...`
+
+        // Render board squares
+        board.forEach((row, rowIndex) => {
+            row.forEach((cell, columnIndex) => {
+                const cellButton = document.createElement("button");
+                cellButton.classList.add("cell");
+                // Assign row and column data attributes
+                cellButton.dataset.row = rowIndex;
+                cellButton.dataset.column = columnIndex;
+                cellButton.textContent = cell.getValue();
+                boardDiv.appendChild(cellButton);
+            });
+        });
+    }
+
+    // Add event listener for the board
+    function clickHandlerBoard(e) {
+
+        const selectedRow = e.target.dataset.row;
+        const selectedColumn = e.target.dataset.column;
+        // Ensure both row and column are identified before proceeding
+        if (selectedRow === undefined || selectedColumn === undefined) return;
+
+        // Convert to numbers as dataset properties are strings
+        game.playRound(parseInt(selectedRow, 10), parseInt(selectedColumn, 10));
+        updateScreen();
+    }
+    boardDiv.addEventListener("click", clickHandlerBoard);
+
+    // Initial render
+    updateScreen();
+
+    // We don't need to return anything from this module because everything is encapsulated inside this screen controller.
+}
+
+ScreenController();
