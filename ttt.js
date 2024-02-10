@@ -103,13 +103,16 @@ function Gameboard() {
         }
     }
 
+    const getBoard = () => board;
+
     // Return the public methods of the Gameboard
     return {
         printBoard: printBoard,
         placeToken: placeToken,
         checkWin: checkWin,
         checkDraw: checkDraw,
-        resetBoard: resetBoard
+        resetBoard: resetBoard,
+        getBoard: getBoard
     };
 }
 
