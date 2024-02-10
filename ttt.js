@@ -17,7 +17,7 @@ function Gameboard() {
     }
 
     // Function to print the current state of the board to the console
-    function printBoard() {
+    const printBoard = () => {
         let boardWithCellValues = [];
         for (let i = 0; i < board.length; i++) {
             let rowValues = [];
@@ -33,7 +33,7 @@ function Gameboard() {
     }
 
     // Function to place a token at a specified location on the board
-    function placeToken(row, column, player) {
+    const placeToken = (row, column, player) => {
         // Check if the specified location is within the bounds of the board
         if (row < 0 || row >= board.length || column < 0 || column >= board[0].length) {
             console.log("Invalid cell. Please choose a valid row and column.");
@@ -54,7 +54,7 @@ function Gameboard() {
     }
 
     // Function to check if there is a win condition on the board
-    function checkWin() {
+    const checkWin = () => {
         // Define all possible winning combinations
         const winningCombinations = [
             // Rows
@@ -83,7 +83,7 @@ function Gameboard() {
     }
 
     // Function to check if the game is a draw
-    function checkDraw() {
+    const checkDraw = () => {
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < columns; j++) {
                 if (board[i][j].getValue() === "") {
@@ -95,7 +95,7 @@ function Gameboard() {
     }
 
     // Function that clears the board, setting all cells back to their initial state (i.e., empty).
-    function resetBoard() {
+    const resetBoard = () => {
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < columns; j++) {
                 board[i][j].reset(); // Assuming you add a reset method to Cell too.
@@ -122,58 +122,53 @@ function Cell() {
     let value = "";
 
     // Function to add a player's token to the cell
-    function addToken(player) {
+    const addToken = (player) => {
         value = player; // Set the cell's value to the player's token
     }
 
     // Function to get the cell's current value
-    function getValue() {
-        return value; // Return the cell's value
-    }
+    const getValue = () => value; // Return the cell's value
 
-    function reset() {
-        value = ""; // Reset the cell's value to empty
-    }
+
+    const reset = () => value = ""; // Reset the cell's value to empty
 
     // Return the public methods of the Cell
     return {
-        addToken: addToken,
-        getValue: getValue,
-        reset: reset
+        addToken,
+        getValue,
+        reset
     };
 }
 
 // Define the GameController function, which manages the game logic and player turns
 function GameController(playerOneName = "Player One", playerTwoName = "Player Two") {
     // Initialize the game board
-    var board = Gameboard();
+    const board = Gameboard();
     // Define the players with their names and tokens
-    var players = [
+    const players = [
         { name: playerOneName, token: "X" },
         { name: playerTwoName, token: "O" }
     ];
 
     // Set the first player as the active player
-    var activePlayer = players[0];
+    let activePlayer = players[0];
 
     // Function to switch the active player after each turn
-    function switchPlayerTurn() {
+    const switchPlayerTurn = () => {
         activePlayer = activePlayer === players[0] ? players[1] : players[0];
-    }
+    };
 
     // Function to get the current active player
-    function getActivePlayer() {
-        return activePlayer;
-    }
+    const getActivePlayer = () => activePlayer;
 
     // Function to print the new round's information
-    function printNewRound() {
+    const printNewRound = () => {
         board.printBoard();
         console.log(`${getActivePlayer().name}'s turn.`);
-    }
+    };
 
     // Function to play a round by placing a token and checking for a win
-    function playRound(row, column) {
+    const playRound = (row, column) => {
         console.log(`Placing ${getActivePlayer().name}'s token at row ${row}, column ${column}...`);
         // Place the token on the board
         board.placeToken(row, column, getActivePlayer().token);
@@ -197,7 +192,7 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
     }
 
     //reset game
-    function resetGame() {
+    const resetGame = () => {
         board.resetBoard(); // Reset the game board
         activePlayer = players[0]; // Reset the active player to the first player
         console.log("Game has been reset. Starting a new game...");
@@ -209,9 +204,9 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
 
     // Return the public methods of the GameController
     return {
-        playRound: playRound,
-        getActivePlayer: getActivePlayer,
-        resetGame: resetGame
+        playRound,
+        getActivePlayer,
+        resetGame
     };
 }
 
