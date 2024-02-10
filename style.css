@@ -9,10 +9,10 @@
     width: 500px;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    border: 1px solid yellow;
-    gap: 2px;
+    border: 2px solid red;
+    gap: 6px;
     padding: 2px;
-    background-color: yellow;
+    background-color: red;
 }
 
 .cell {
@@ -21,7 +21,7 @@
     align-items: center;
     text-align: center;
     font-size: 2rem;
-    border: 1px solid grey;
-    background: lightyellow;
+    border: 3px solid black;
+    background: whitesmoke;
     cursor: pointer;
 }

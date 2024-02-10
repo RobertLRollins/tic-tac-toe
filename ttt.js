@@ -37,7 +37,7 @@ function Gameboard() {
         // Check if the specified location is within the bounds of the board
         if (row < 0 || row >= board.length || column < 0 || column >= board[0].length) {
             console.log("Invalid cell. Please choose a valid row and column.");
-            return;
+            return false; // Indicate the placement was not successful
         }
 
         // Access the specified cell
@@ -46,11 +46,12 @@ function Gameboard() {
         // Check if the cell is already occupied
         if (cell.getValue() !== "") {
             console.log("This cell is already occupied. Please choose another cell.");
-            return;
+            return false; // Indicate the placement was not successful
         }
 
         // If the cell is not occupied, place the player's token in the cell
         cell.addToken(player);
+        return true; // Indicate the placement was successful
     }
 
     // Function to check if there is a win condition on the board
@@ -170,25 +171,28 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
     // Function to play a round by placing a token and checking for a win
     const playRound = (row, column) => {
         console.log(`Placing ${getActivePlayer().name}'s token at row ${row}, column ${column}...`);
-        // Place the token on the board
-        board.placeToken(row, column, getActivePlayer().token);
+        // Attempt to place the token on the board and check if the move was valid
+        const moveValid = board.placeToken(row, column, getActivePlayer().token);
 
-        // Check for a win after placing the token
-        if (board.checkWin()) {
-            console.log(`${getActivePlayer().name} wins!`);
-            board.printBoard();
-            resetGame();
-            return; // Stop further execution to prevent switching turns after a win
-        } else if (board.checkDraw()) { // Check for a draw
-            console.log("Game is a draw!");
-            board.printBoard();
-            resetGame();
-            return; // Stop further execution after a draw
+        if (moveValid) {
+            // If the move was valid, check for a win or draw
+            if (board.checkWin()) {
+                console.log(`${getActivePlayer().name} wins!`);
+                board.printBoard();
+                resetGame();
+                return; // Exit the function after a win
+            } else if (board.checkDraw()) {
+                console.log("Game is a draw!");
+                board.printBoard();
+                resetGame();
+                return; // Exit the function after a draw
+            }
+
+            // If there's no win or draw, switch to the next player
+            switchPlayerTurn();
         }
 
-        // Switch to the next player's turn if no win or draw is detected
-        switchPlayerTurn();
-        printNewRound();
+        printNewRound(); // Print the new round's information whether the move was valid or not
     }
 
     //reset game
