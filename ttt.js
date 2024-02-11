@@ -149,9 +149,10 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
         { name: playerOneName, token: "X" },
         { name: playerTwoName, token: "O" }
     ];
-
     // Set the first player as the active player
     let activePlayer = players[0];
+    // Tracks if the game has ended
+    let gameEnded = false;
 
     // Function to switch the active player after each turn
     const switchPlayerTurn = () => {
@@ -169,6 +170,9 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
 
     // Function to play a round by placing a token and checking for a win
     const playRound = (row, column) => {
+
+
+
         console.log(`Placing ${getActivePlayer().name}'s token at row ${row}, column ${column}...`);
         const moveValid = board.placeToken(row, column, getActivePlayer().token);
 
@@ -177,12 +181,14 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
                 const winMessage = `${getActivePlayer().name} wins!`;
                 console.log(winMessage);
                 board.printBoard();
-                return { gameEnded: true, message: winMessage };
+                gameEnded = true;
+                return { gameEnded, message: winMessage };
             } else if (board.checkDraw()) {
                 const drawMessage = "Game is a draw!";
                 console.log(drawMessage);
                 board.printBoard();
-                return { gameEnded: true, message: drawMessage };
+                gameEnded = true;
+                return { gameEnded, message: drawMessage };
             }
             switchPlayerTurn();
         }
@@ -194,10 +200,13 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
     const resetGame = () => {
         board.resetBoard(); // Reset the game board
         activePlayer = players[0]; // Reset the active player to the first player
+        gameEnded = false; // Reset the gameEnded flag
         console.log("Game has been reset. Starting a new game...");
         printNewRound(); // Print the new round's information
     }
 
+    // Method to check if the game has ended
+    const isGameEnded = () => gameEnded;
     // Print the initial round information
     printNewRound();
 
@@ -206,7 +215,8 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
         playRound,
         getActivePlayer,
         resetGame,
-        getBoard: board.getBoard
+        getBoard: board.getBoard,
+        isGameEnded
     };
 }
 
@@ -244,6 +254,12 @@ function ScreenController() {
 
     // Add event listener for the board
     function clickHandlerBoard(e) {
+        console.log(game.isGameEnded());
+        if (game.isGameEnded()) { // Check if the game has ended
+            console.log("No further moves allowed. Please reset the game.");
+            return; // Exit the function to prevent further moves
+        }
+
         const selectedRow = e.target.dataset.row;
         const selectedColumn = e.target.dataset.column;
 
@@ -267,4 +283,4 @@ function ScreenController() {
 }
 
 ScreenController();
-//How would I make it so that playerTurnDiv.textContent displays the active player at the start before any move has been made?
+//How would I make it so that the board is locked and no further moves are made after a win or draw
