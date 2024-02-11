@@ -1,5 +1,5 @@
 * {
-    background-color: black;
+    background-color: whitesmoke;
     color: red;
 }
 
@@ -9,10 +9,6 @@
     width: 500px;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
-    border: 2px solid red;
-    gap: 6px;
-    padding: 2px;
-    background-color: red;
 }
 
 .cell {
@@ -21,7 +17,16 @@
     align-items: center;
     text-align: center;
     font-size: 5rem;
-    border: 3px solid black;
     background: whitesmoke;
     cursor: pointer;
+    border-image-slice:
+        180 180 180 180;
+    border-image-width:
+        30% 30% 30% 30%;
+    border-image-outset:
+        0px 0px 0px 0px;
+    border-image-repeat:
+        stretch stretch;
+    border-image-source:
+        url("tttBorder.png");
 }
