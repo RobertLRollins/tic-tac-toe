@@ -1,14 +1,18 @@
 * {
     background-color: whitesmoke;
-    color: red;
+    color: black;
+    border: none;
 }
 
 .board {
     display: grid;
-    height: 500px;
-    width: 500px;
+    height: 1200px;
+    width: 1200px;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
+    background-image: url("board.png");
+    background-size: cover;
+    background-position: center;
 }
 
 .cell {
@@ -16,17 +20,7 @@
     justify-content: center;
     align-items: center;
     text-align: center;
-    font-size: 5rem;
-    background: whitesmoke;
+    font-size: 300px;
     cursor: pointer;
-    border-image-slice:
-        180 180 180 180;
-    border-image-width:
-        30% 30% 30% 30%;
-    border-image-outset:
-        0px 0px 0px 0px;
-    border-image-repeat:
-        stretch stretch;
-    border-image-source:
-        url("tttBorder.png");
+    background-color: transparent;
 }
