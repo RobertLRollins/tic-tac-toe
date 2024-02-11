@@ -1,4 +1,3 @@
-//how would I add a draw condition
 // Define the Gameboard function, which initializes and manages the game board
 function Gameboard() {
     // Set the dimensions of the Tic Tac Toe board
@@ -171,29 +170,25 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
     // Function to play a round by placing a token and checking for a win
     const playRound = (row, column) => {
         console.log(`Placing ${getActivePlayer().name}'s token at row ${row}, column ${column}...`);
-        // Attempt to place the token on the board and check if the move was valid
         const moveValid = board.placeToken(row, column, getActivePlayer().token);
 
         if (moveValid) {
-            // If the move was valid, check for a win or draw
             if (board.checkWin()) {
-                console.log(`${getActivePlayer().name} wins!`);
+                const winMessage = `${getActivePlayer().name} wins!`;
+                console.log(winMessage);
                 board.printBoard();
-                resetGame();
-                return; // Exit the function after a win
+                return { gameEnded: true, message: winMessage };
             } else if (board.checkDraw()) {
-                console.log("Game is a draw!");
+                const drawMessage = "Game is a draw!";
+                console.log(drawMessage);
                 board.printBoard();
-                resetGame();
-                return; // Exit the function after a draw
+                return { gameEnded: true, message: drawMessage };
             }
-
-            // If there's no win or draw, switch to the next player
             switchPlayerTurn();
         }
-
-        printNewRound(); // Print the new round's information whether the move was valid or not
-    }
+        // If the game continues without a win or draw
+        return { gameEnded: false, message: `${getActivePlayer().name}'s turn.` };
+    };
 
     //reset game
     const resetGame = () => {
@@ -220,16 +215,13 @@ function ScreenController() {
     const playerTurnDiv = document.querySelector('.turn');
     const boardDiv = document.querySelector('.board');
 
-    const updateScreen = () => {
+    const updateScreen = (gameEnded = false) => {
         // clear the board
         boardDiv.textContent = "";
 
         // get the newest version of the board and player turn
         const board = game.getBoard();
-        const activePlayer = game.getActivePlayer();
 
-        // Display player's turn
-        playerTurnDiv.textContent = `${activePlayer.name}'s turn...`
 
         // Render board squares
         board.forEach((row, rowIndex) => {
@@ -243,19 +235,28 @@ function ScreenController() {
                 boardDiv.appendChild(cellButton);
             });
         });
+
+        // If the game hasn't ended, update the player turn display with the current active player's name
+        if (!gameEnded) {
+            playerTurnDiv.textContent = `${game.getActivePlayer().name}'s turn`;
+        }
     }
 
     // Add event listener for the board
     function clickHandlerBoard(e) {
-
         const selectedRow = e.target.dataset.row;
         const selectedColumn = e.target.dataset.column;
-        // Ensure both row and column are identified before proceeding
+
         if (selectedRow === undefined || selectedColumn === undefined) return;
 
-        // Convert to numbers as dataset properties are strings
-        game.playRound(parseInt(selectedRow, 10), parseInt(selectedColumn, 10));
-        updateScreen();
+        const result = game.playRound(parseInt(selectedRow, 10), parseInt(selectedColumn, 10));
+
+        if (result.gameEnded) {
+            playerTurnDiv.textContent = result.message; // Display the winner or draw message
+            updateScreen(true); // Update the screen with the flag that game has ended
+        } else {
+            updateScreen(); // Update the screen normally
+        }
     }
     boardDiv.addEventListener("click", clickHandlerBoard);
 
@@ -266,3 +267,4 @@ function ScreenController() {
 }
 
 ScreenController();
+//How would I make it so that playerTurnDiv.textContent displays the active player at the start before any move has been made?
