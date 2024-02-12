@@ -29,6 +29,12 @@
     background-color: transparent;
 }
 
+.cell img {
+    background: transparent;
+    width: 300px;
+    height: 300px;
+}
+
 .resetButton button {
     font-size: 50px;
     cursor: pointer;

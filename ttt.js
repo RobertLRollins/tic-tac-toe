@@ -251,7 +251,7 @@ function ScreenController() {
         // get the newest version of the board and player turn
         const board = game.getBoard();
 
-
+        /*
         // Render board squares
         board.forEach((row, rowIndex) => {
             row.forEach((cell, columnIndex) => {
@@ -261,6 +261,32 @@ function ScreenController() {
                 cellButton.dataset.row = rowIndex;
                 cellButton.dataset.column = columnIndex;
                 cellButton.textContent = cell.getValue();
+                boardDiv.appendChild(cellButton);
+            });
+        });
+        */
+
+        // Define paths to your images
+        const imagePathX = 'X14.png'; // Update this path
+        const imagePathO = 'Circle15.png'; // Update this path
+
+        // Render board squares
+        board.forEach((row, rowIndex) => {
+            row.forEach((cell, columnIndex) => {
+                const cellButton = document.createElement("button");
+                cellButton.classList.add("cell");
+                // Assign row and column data attributes
+                cellButton.dataset.row = rowIndex;
+                cellButton.dataset.column = columnIndex;
+
+                // Check the cell value and add corresponding image
+                const cellValue = cell.getValue();
+                if (cellValue === "X" || cellValue === "O") {
+                    const cellImage = document.createElement("img");
+                    cellImage.src = cellValue === "X" ? imagePathX : imagePathO;
+                    cellButton.appendChild(cellImage);
+                }
+
                 boardDiv.appendChild(cellButton);
             });
         });
