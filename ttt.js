@@ -224,6 +224,25 @@ function ScreenController() {
     const game = GameController();
     const playerTurnDiv = document.querySelector('.turn');
     const boardDiv = document.querySelector('.board');
+    const resetButtonDiv = document.querySelector('.resetButton'); // Select the div for the reset button
+
+    // Function to show or hide the reset button
+    const toggleResetButton = (show) => {
+        resetButtonDiv.innerHTML = ''; // Clear the div content
+        if (show) {
+            const resetButton = document.createElement("button");
+            resetButton.textContent = "Reset Game";
+            resetButton.addEventListener("click", resetHandler);
+            resetButtonDiv.appendChild(resetButton);
+        }
+    }
+
+    // Handler for resetting the game
+    const resetHandler = () => {
+        game.resetGame();
+        updateScreen(); // Update the screen after resetting
+        toggleResetButton(false); // Hide the reset button
+    }
 
     const updateScreen = (gameEnded = false) => {
         // clear the board
@@ -250,6 +269,8 @@ function ScreenController() {
         if (!gameEnded) {
             playerTurnDiv.textContent = `${game.getActivePlayer().name}'s turn`;
         }
+
+        toggleResetButton(gameEnded); // Show the reset button if the game has ended
     }
 
     // Add event listener for the board
@@ -283,4 +304,3 @@ function ScreenController() {
 }
 
 ScreenController();
-//How would I make it so that the board is locked and no further moves are made after a win or draw
