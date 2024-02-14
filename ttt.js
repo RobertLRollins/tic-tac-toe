@@ -226,6 +226,9 @@ function ScreenController() {
     const boardDiv = document.querySelector('.board');
     const resetButtonDiv = document.querySelector('.resetButton'); // Select the div for the reset button
 
+    // Tracking the state of each cell (GIF or PNG)
+    let cellState = Array.from(Array(3), () => new Array(3).fill(false));
+
     // Function to show or hide the reset button
     const toggleResetButton = (show) => {
         resetButtonDiv.innerHTML = ''; // Clear the div content
@@ -240,6 +243,7 @@ function ScreenController() {
     // Handler for resetting the game
     const resetHandler = () => {
         game.resetGame();
+        cellState = Array.from(Array(3), () => new Array(3).fill(false)); // Reset cell states
         updateScreen(); // Update the screen after resetting
         toggleResetButton(false); // Hide the reset button
     }
@@ -251,24 +255,14 @@ function ScreenController() {
         // get the newest version of the board and player turn
         const board = game.getBoard();
 
-        /*
-        // Render board squares
-        board.forEach((row, rowIndex) => {
-            row.forEach((cell, columnIndex) => {
-                const cellButton = document.createElement("button");
-                cellButton.classList.add("cell");
-                // Assign row and column data attributes
-                cellButton.dataset.row = rowIndex;
-                cellButton.dataset.column = columnIndex;
-                cellButton.textContent = cell.getValue();
-                boardDiv.appendChild(cellButton);
-            });
-        });
-        */
-
         // Define paths to your images
-        const imagePathX = 'X14.png'; // Update this path
-        const imagePathO = 'Circle15.png'; // Update this path
+        const imagePathX = 'X.png';
+        const imagePathO = 'O.png';
+        const gifPathX = 'X.gif';
+        const gifPathO = 'O.gif';
+
+        const gifDurationX = 1500; // Example: 1000 milliseconds (1 second) for X
+        const gifDurationO = 1500; // Example: 1000 milliseconds (1 second) for O
 
         // Render board squares
         board.forEach((row, rowIndex) => {
@@ -279,11 +273,21 @@ function ScreenController() {
                 cellButton.dataset.row = rowIndex;
                 cellButton.dataset.column = columnIndex;
 
-                // Check the cell value and add corresponding image
+                // Check the cell value and add corresponding GIF, then switch to image
                 const cellValue = cell.getValue();
-                if (cellValue === "X" || cellValue === "O") {
+                if (cellValue) {
                     const cellImage = document.createElement("img");
-                    cellImage.src = cellValue === "X" ? imagePathX : imagePathO;
+                    const alreadyConvertedToPNG = cellState[rowIndex][columnIndex];
+
+                    if (alreadyConvertedToPNG) {
+                        cellImage.src = cellValue === "X" ? imagePathX : imagePathO;
+                    } else {
+                        cellImage.src = cellValue === "X" ? gifPathX : gifPathO;
+                        setTimeout(() => {
+                            cellImage.src = cellValue === "X" ? imagePathX : imagePathO;
+                            cellState[rowIndex][columnIndex] = true; // Mark as converted to PNG
+                        }, cellValue === "X" ? gifDurationX : gifDurationO);
+                    }
                     cellButton.appendChild(cellImage);
                 }
 
@@ -302,9 +306,9 @@ function ScreenController() {
     // Add event listener for the board
     function clickHandlerBoard(e) {
         console.log(game.isGameEnded());
-        if (game.isGameEnded()) { // Check if the game has ended
+        if (game.isGameEnded()) {
             console.log("No further moves allowed. Please reset the game.");
-            return; // Exit the function to prevent further moves
+            return;
         }
 
         const selectedRow = e.target.dataset.row;
