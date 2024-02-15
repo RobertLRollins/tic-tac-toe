@@ -229,15 +229,13 @@ function ScreenController() {
     // Tracking the state of each cell (GIF or PNG)
     let cellState = Array.from(Array(3), () => new Array(3).fill(false));
 
-    // Function to show or hide the reset button
-    const toggleResetButton = (show) => {
+    // Function to initialize the reset button
+    const initializeResetButton = () => {
         resetButtonDiv.innerHTML = ''; // Clear the div content
-        if (show) {
-            const resetButton = document.createElement("button");
-            resetButton.textContent = "Reset Game";
-            resetButton.addEventListener("click", resetHandler);
-            resetButtonDiv.appendChild(resetButton);
-        }
+        const resetButton = document.createElement("button");
+        resetButton.textContent = "Reset Game";
+        resetButton.addEventListener("click", resetHandler);
+        resetButtonDiv.appendChild(resetButton);
     }
 
     // Handler for resetting the game
@@ -245,7 +243,6 @@ function ScreenController() {
         game.resetGame();
         cellState = Array.from(Array(3), () => new Array(3).fill(false)); // Reset cell states
         updateScreen(); // Update the screen after resetting
-        toggleResetButton(false); // Hide the reset button
     }
 
     const updateScreen = (gameEnded = false) => {
@@ -326,6 +323,9 @@ function ScreenController() {
         }
     }
     boardDiv.addEventListener("click", clickHandlerBoard);
+
+    // Initialize and show the reset button as soon as the screen controller loads
+    initializeResetButton();
 
     // Initial render
     updateScreen();
