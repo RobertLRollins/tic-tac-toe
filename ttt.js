@@ -71,15 +71,15 @@ function Gameboard() {
         ];
 
         // Check each winning combination
+
         for (let combo of winningCombinations) {
             const [a, b, c] = combo;
-            // Check if the cells in the combination are all occupied by the same player
             if (board[a[0]][a[1]].getValue() && board[a[0]][a[1]].getValue() === board[b[0]][b[1]].getValue() && board[a[0]][a[1]].getValue() === board[c[0]][c[1]].getValue()) {
-                return true; // A win is detected
+                return combo; // Return the winning combination instead of just true
             }
         }
+        return null; // Return null instead of false to indicate no win
 
-        return false; // No win condition is found
     }
 
     // Function to check if the game is a draw
@@ -170,31 +170,30 @@ function GameController(playerOneName = "Player One", playerTwoName = "Player Tw
 
     // Function to play a round by placing a token and checking for a win
     const playRound = (row, column) => {
-
-
-
         console.log(`Placing ${getActivePlayer().name}'s token at row ${row}, column ${column}...`);
         const moveValid = board.placeToken(row, column, getActivePlayer().token);
 
         if (moveValid) {
-            if (board.checkWin()) {
+            const winningCombo = board.checkWin(); // This now returns the winning combination or null
+            if (winningCombo) {
                 const winMessage = `${getActivePlayer().name} wins!`;
                 console.log(winMessage);
                 board.printBoard();
                 gameEnded = true;
-                return { gameEnded, message: winMessage };
+                return { gameEnded, message: winMessage, winningCombo }; // Include winningCombo in the return
             } else if (board.checkDraw()) {
                 const drawMessage = "Game is a draw!";
                 console.log(drawMessage);
                 board.printBoard();
                 gameEnded = true;
-                return { gameEnded, message: drawMessage };
+                return { gameEnded, message: drawMessage, winningCombo: null }; // No winningCombo in case of a draw
             }
             switchPlayerTurn();
         }
         // If the game continues without a win or draw
-        return { gameEnded: false, message: `${getActivePlayer().name}'s turn.` };
+        return { gameEnded: false, message: `${getActivePlayer().name}'s turn.`, winningCombo: null };
     };
+
 
     //reset game
     const resetGame = () => {
@@ -245,32 +244,29 @@ function ScreenController() {
         updateScreen(); // Update the screen after resetting
     }
 
-    const updateScreen = (gameEnded = false) => {
-        // clear the board
-        boardDiv.textContent = "";
+    const updateScreen = (gameEnded = false, winningCombo = null) => {
+        boardDiv.textContent = ""; // Clear the board
 
-        // get the newest version of the board and player turn
         const board = game.getBoard();
 
-        // Define paths to your images
+        // Paths to your images and GIFs
         const imagePathX = 'X.png';
         const imagePathO = 'O.png';
         const gifPathX = 'X.gif';
         const gifPathO = 'O.gif';
-
-        const gifDurationX = 1500; // Example: 1000 milliseconds (1 second) for X
-        const gifDurationO = 1500; // Example: 1000 milliseconds (1 second) for O
+        const winningGifPaths = [
+            'D1.png', 'D1.png', 'D1.png', 'D1.png',
+            'D1.png', 'D1.png', 'D1.png', 'D1.png'
+        ];
 
         // Render board squares
         board.forEach((row, rowIndex) => {
             row.forEach((cell, columnIndex) => {
                 const cellButton = document.createElement("button");
                 cellButton.classList.add("cell");
-                // Assign row and column data attributes
                 cellButton.dataset.row = rowIndex;
                 cellButton.dataset.column = columnIndex;
 
-                // Check the cell value and add corresponding GIF, then switch to image
                 const cellValue = cell.getValue();
                 if (cellValue) {
                     const cellImage = document.createElement("img");
@@ -282,8 +278,8 @@ function ScreenController() {
                         cellImage.src = cellValue === "X" ? gifPathX : gifPathO;
                         setTimeout(() => {
                             cellImage.src = cellValue === "X" ? imagePathX : imagePathO;
-                            cellState[rowIndex][columnIndex] = true; // Mark as converted to PNG
-                        }, cellValue === "X" ? gifDurationX : gifDurationO);
+                            cellState[rowIndex][columnIndex] = true;
+                        }, 1500); // Adjust timing as needed
                     }
                     cellButton.appendChild(cellImage);
                 }
@@ -292,12 +288,44 @@ function ScreenController() {
             });
         });
 
-        // If the game hasn't ended, update the player turn display with the current active player's name
         if (!gameEnded) {
             playerTurnDiv.textContent = `${game.getActivePlayer().name}'s turn`;
         }
 
-        toggleResetButton(gameEnded); // Show the reset button if the game has ended
+        // Display winning GIF overlay if there's a winning combination
+        if (gameEnded && winningCombo) {
+            const winningIndex = determineWinningIndex(winningCombo);
+            if (winningIndex !== -1) {
+                const winningGifPath = winningGifPaths[winningIndex];
+                const gifOverlay = document.createElement("img");
+                gifOverlay.src = winningGifPath;
+                gifOverlay.style.position = 'absolute';
+                gifOverlay.style.top = '0';
+                gifOverlay.style.left = '0';
+                gifOverlay.style.width = '100%';
+                gifOverlay.style.height = '100%';
+                gifOverlay.classList.add("winning-overlay");
+                boardDiv.style.position = 'relative';
+                boardDiv.appendChild(gifOverlay);
+            }
+        }
+    };
+
+    // Helper function to determine the index of the winning combination
+    function determineWinningIndex(winningCombo) {
+        // Assuming you have a predefined set of winning combinations in the Gameboard
+        const winningCombinations = [
+            [[0, 0], [0, 1], [0, 2]], [[1, 0], [1, 1], [1, 2]], [[2, 0], [2, 1], [2, 2]], // Rows
+            [[0, 0], [1, 0], [2, 0]], [[0, 1], [1, 1], [2, 1]], [[0, 2], [1, 2], [2, 2]], // Columns
+            [[0, 0], [1, 1], [2, 2]], [[0, 2], [1, 1], [2, 0]] // Diagonals
+        ];
+
+        for (let i = 0; i < winningCombinations.length; i++) {
+            if (JSON.stringify(winningCombinations[i]) === JSON.stringify(winningCombo)) {
+                return i; // Return the index of the matching winning combination
+            }
+        }
+        return -1; // In case no match is found
     }
 
     // Add event listener for the board
@@ -317,7 +345,7 @@ function ScreenController() {
 
         if (result.gameEnded) {
             playerTurnDiv.textContent = result.message; // Display the winner or draw message
-            updateScreen(true); // Update the screen with the flag that game has ended
+            updateScreen(true, result.winningCombo); // Update the screen with the flag that game has ended
         } else {
             updateScreen(); // Update the screen normally
         }
@@ -329,8 +357,6 @@ function ScreenController() {
 
     // Initial render
     updateScreen();
-
-    // We don't need to return anything from this module because everything is encapsulated inside this screen controller.
 }
 
 ScreenController();

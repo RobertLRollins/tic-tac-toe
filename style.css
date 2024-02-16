@@ -55,3 +55,15 @@ body {
     margin-top: 60px;
     background: transparent;
 }
+
+.winning-overlay {
+    position: absolute;
+    /* Adjust as necessary */
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* Make sure it covers the boardDiv */
+    height: 100%;
+    z-index: 10;
+    /* Ensure it's above the board */
+}
