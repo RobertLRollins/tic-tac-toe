@@ -227,6 +227,7 @@ function ScreenController() {
 
     // Tracking the state of each cell (GIF or PNG)
     let cellState = Array.from(Array(3), () => new Array(3).fill(false));
+    let isWaiting = false; // Track if waiting for an animation to complete
 
     // Function to initialize the reset button
     const initializeResetButton = () => {
@@ -272,14 +273,33 @@ function ScreenController() {
                     const cellImage = document.createElement("img");
                     const alreadyConvertedToPNG = cellState[rowIndex][columnIndex];
 
-                    if (alreadyConvertedToPNG) {
-                        cellImage.src = cellValue === "X" ? imagePathX : imagePathO;
-                    } else {
+                    if (!alreadyConvertedToPNG) {
                         cellImage.src = cellValue === "X" ? gifPathX : gifPathO;
+                        isWaiting = true; // Set waiting state before starting the animation
                         setTimeout(() => {
                             cellImage.src = cellValue === "X" ? imagePathX : imagePathO;
                             cellState[rowIndex][columnIndex] = true;
+                            isWaiting = false; // Reset waiting state after animation completes
+                            // Display winning GIF overlay if there's a winning combination
+                            if (gameEnded && winningCombo) {
+                                const winningIndex = determineWinningIndex(winningCombo);
+                                if (winningIndex !== -1) {
+                                    const winningGifPath = winningGifPaths[winningIndex];
+                                    const gifOverlay = document.createElement("img");
+                                    gifOverlay.src = winningGifPath;
+                                    gifOverlay.style.position = 'absolute';
+                                    gifOverlay.style.top = '0';
+                                    gifOverlay.style.left = '0';
+                                    gifOverlay.style.width = '100%';
+                                    gifOverlay.style.height = '100%';
+                                    gifOverlay.classList.add("winning-overlay");
+                                    boardDiv.style.position = 'relative';
+                                    boardDiv.appendChild(gifOverlay);
+                                }
+                            }
                         }, 1500); // Adjust timing as needed
+                    } else {
+                        cellImage.src = cellValue === "X" ? imagePathX : imagePathO;
                     }
                     cellButton.appendChild(cellImage);
                 }
@@ -290,24 +310,6 @@ function ScreenController() {
 
         if (!gameEnded) {
             playerTurnDiv.textContent = `${game.getActivePlayer().name}'s turn`;
-        }
-
-        // Display winning GIF overlay if there's a winning combination
-        if (gameEnded && winningCombo) {
-            const winningIndex = determineWinningIndex(winningCombo);
-            if (winningIndex !== -1) {
-                const winningGifPath = winningGifPaths[winningIndex];
-                const gifOverlay = document.createElement("img");
-                gifOverlay.src = winningGifPath;
-                gifOverlay.style.position = 'absolute';
-                gifOverlay.style.top = '0';
-                gifOverlay.style.left = '0';
-                gifOverlay.style.width = '100%';
-                gifOverlay.style.height = '100%';
-                gifOverlay.classList.add("winning-overlay");
-                boardDiv.style.position = 'relative';
-                boardDiv.appendChild(gifOverlay);
-            }
         }
     };
 
@@ -331,7 +333,7 @@ function ScreenController() {
     // Add event listener for the board
     function clickHandlerBoard(e) {
         console.log(game.isGameEnded());
-        if (game.isGameEnded()) {
+        if (isWaiting || game.isGameEnded()) {
             console.log("No further moves allowed. Please reset the game.");
             return;
         }
