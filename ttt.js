@@ -256,8 +256,8 @@ function ScreenController() {
         const gifPathX = 'X.gif';
         const gifPathO = 'O.gif';
         const winningGifPaths = [
-            'D1.png', 'D1.png', 'D1.png', 'D1.png',
-            'D1.png', 'D1.png', 'D1.png', 'D1.png'
+            'H1.gif', 'H2.gif', 'H3.gif', 'V1.gif',
+            'V2.gif', 'V3.gif', 'D1.gif', 'D2.gif'
         ];
 
         // Render board squares
